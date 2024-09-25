@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zarathustra's Dice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Slab:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif; /* Updated font for body text */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(to right, #e0f7fa, #80deea);
+            margin: 0;
+        }
+        h1 {
+            font-family: 'Roboto Slab', serif; /* Decorative font for the title */
+            margin-bottom: 20px;
+            color: #333;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            font-size: 28px; /* Adjusted title size */
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 22px;
+            font-weight: 500;
+            color: #333;
+            opacity: 0; /* Start hidden */
+            transform: translateY(-20px); /* Start slightly above */
+            transition: opacity 0.5s ease, transform 0.5s ease; /* Transition for opacity and position */
+        }
+        #description {
+            margin-top: 10px;
+            font-size: 16px; /* Adjusted for better readability */
+            color: #444;
+            opacity: 0; /* Start hidden */
+            transform: translateY(-20px); /* Start slightly above */
+            transition: opacity 0.5s ease, transform 0.5s ease; /* Transition for opacity and position */
+            background-color: #fdfdfd; /* Light background color for the card */
+            border-radius: 15px; /* Rounded corners */
+            padding: 20px; /* Padding for inner content */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Enhanced shadow for a 3D effect */
+            max-width: 300px; /* Max width for the card */
+            text-align: left; /* Left align text */
+            position: relative; /* Position for the image */
+            overflow: hidden; /* Clip the image to fit the card */
+            border: 5px solid transparent; /* Placeholder for dynamic border colors */
+        }
+        .persona-image {
+            width: 100%; /* Make the image responsive */
+            height: auto; /* Maintain aspect ratio */
+            border-radius: 15px 15px 0 0; /* Rounded top corners */
+        }
+        .description-item {
+            margin: 8px 0; /* Space between lines */
+        }
+        .description-item strong {
+            font-weight: bold; /* Bold for emphasis on subtitles */
+            font-size: 14px; /* Slightly smaller for a refined look */
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #28a745; /* Button color */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.3s; /* Add transform transition */
+            margin-bottom: 20px; /* Space below the button */
+        }
+        button:hover {
+            background-color: #218838;
+            transform: scale(1.05); /* Scale up on hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow on hover */
+        }
+        /* Card Hover Effect */
+        #description:hover {
+            transform: scale(1.02); /* Slightly increase size */
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4); /* Enhance shadow on hover */
+        }
+        /* Roll Animation */
+        @keyframes roll {
+            0% { transform: rotate(0); }
+            25% { transform: rotate(10deg); }
+            50% { transform: rotate(-10deg); }
+            75% { transform: rotate(5deg); }
+            100% { transform: rotate(0); }
+        }
+        @media (max-width: 600px) {
+            #description {
+                max-width: 90%; /* Wider on smaller screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Zarathustra's Dice</h1>
+    <button id="rollButton">Roll the Dice!</button>
+    <div id="result"></div>
+    <div id="description"></div>
+
+    <audio id="soundEffect" src="" preload="auto"></audio>
+
+    <script>
+        const personas = [
+            { 
+                name: "Fliege", 
+                description: "The Fly: A symbol of transformation and adaptability. Thinks quickly and speaks in quick, short bursts.", 
+                sound: "sounds/fly.mp3", 
+                voice: "Energetic and playful.",
+                action: "Be spontaneous and quick-witted. Adapt to changing dynamics in the meeting.",
+                image: "images/fly.jpg", // Replace with the correct image path
+                borderColor: "#ff5733" // Unique border color
+            },
+            { 
+                name: "Adler", 
+                description: "The Eagle: Represents vision, strength, and freedom. Speaks with authority and confidence.", 
+                sound: "sounds/eagle.mp3", 
+                voice: "Authoritative and grand.",
+                action: "Take a leadership role. Encourage others to see the bigger picture and aim high.",
+                image: "images/eagle.jpg", // Replace with the correct image path
+                borderColor: "#33c9ff" // Unique border color
+            },
+            { 
+                name: "Taube", 
+                description: "The Dove: A symbol of peace, purity, and hope. Speaks softly and soothingly.", 
+                sound: "sounds/dove.mp3", 
+                voice: "Calm and reassuring.",
+                action: "Foster a peaceful environment. Listen actively and promote harmony among participants.",
+                image: "images/dove.jpg", // Replace with the correct image path
+                borderColor: "#ffcc33" // Unique border color
+            },
+            { 
+                name: "Kuh", 
+                description: "The Cow: Represents nurturing, motherhood, and abundance. Speaks slowly and deliberately.", 
+                sound: "sounds/cow.mp3", 
+                voice: "Gentle and motherly.",
+                action: "Be supportive and nurturing. Offer encouragement and express gratitude for contributions.",
+                image: "images/cow.jpg", // Replace with the correct image path
+                borderColor: "#33ff57" // Unique border color
+            },
+            { 
+                name: "Esel", 
+                description: "The Donkey: A symbol of patience, humility, and hard work. Only says 'Ee-ah'.", 
+                sound: "sounds/donkey.mp3", 
+                voice: "Sturdy and direct.",
+                action: "Demonstrate patience and perseverance. Provide grounded, practical insights.",
+                image: "images/donkey.jpg", // Replace with the correct image path
+                borderColor: "#ff33b5" // Unique border color
+            },
+            { 
+                name: "Affe", 
+                description: "The Monkey: Represents playfulness, curiosity, and mischief. Uses playful banter and jokes.", 
+                sound: "sounds/monkey.mp3", 
+                voice: "Fun-loving and jovial.",
+                action: "Bring energy and laughter to the meeting. Use humor to lighten the mood and encourage creativity.",
+                image: "images/monkey.jpg", // Replace with the correct image path
+                borderColor: "#3357ff" // Unique border color
+            },
+            { 
+                name: "Übermensch", 
+                description: "The Übermensch: Symbolizes the ideal individual who transcends conventional morality. Speaks boldly and philosophically.", 
+                sound: "sounds/overman.mp3", 
+                voice: "Confident and challenging.",
+                action: "Challenge norms and encourage innovative thinking. Inspire others to rise above limitations.",
+                image: "images/overman.jpg", // Replace with the correct image path
+                borderColor: "#8e44ad" // Unique border color
+            },
+            { 
+                name: "Schlange", 
+                description: "The Snake: Represents wisdom, renewal, and temptation. Speaks in riddles or with a sense of mystery.", 
+                sound: "sounds/snake.mp3", 
+                voice: "Enigmatic and wise.",
+                action: "Offer deep insights and provoke thought. Use metaphors to convey complex ideas.",
+                image: "images/snake.jpg", // Replace with the correct image path
+                borderColor: "#e74c3c" // Unique border color
+            },
+            { 
+                name: "Tarantel", 
+                description: "The Tarantula: Represents manipulation and hidden intentions. Speaks with calculated words.", 
+                sound: "sounds/tarantula.mp3", 
+                voice: "Cunning and precise.",
+                action: "Influence discussions subtly. Use strategic language to inspire and captivate.",
+                image: "images/tarantula.jpg", // Replace with the correct image path
+                borderColor: "#f39c12" // Unique border color
+            },
+            { 
+                name: "Schmarotzer", 
+                description: "The Parasite: Represents dependency and survival. Speaks to the needs of others and builds rapport.", 
+                sound: "sounds/parasite.mp3", 
+                voice: "Sympathetic and understanding.",
+                action: "Focus on collaboration and support. Highlight interdependence and mutual benefits.",
+                image: "images/parasite.jpg", // Replace with the correct image path
+                borderColor: "#d35400" // Unique border color
+            },
+            { 
+                name: "Auster", 
+                description: "The Oyster: Symbolizes protection and hidden treasures. Speaks slowly and reflects deeply.", 
+                sound: "sounds/oyster.mp3", 
+                voice: "Reflective and deep.",
+                action: "Encourage discovery and exploration of hidden ideas. Allow for deeper discussions.",
+                image: "images/oyster.jpg", // Replace with the correct image path
+                borderColor: "#1abc9c" // Unique border color
+            },
+            { 
+                name: "Blutegel", 
+                description: "The Leech: Represents attachment, survival, and healing. Speaks directly and with intention.", 
+                sound: "sounds/leeches.mp3", 
+                voice: "Direct and purposeful.",
+                action: "Focus on healing or resolving conflicts. Be direct in addressing issues.",
+                image: "images/leeches.jpg", // Replace with the correct image path
+                borderColor: "#c0392b" // Unique border color
+            }
+        ];
+
+        const rollButton = document.getElementById('rollButton');
+        const resultDiv = document.getElementById('result');
+        const descriptionDiv = document.getElementById('description');
+        const soundEffect = document.getElementById('soundEffect');
+
+        rollButton.addEventListener('click', () => {
+            // Roll animation
+            rollButton.style.animation = 'roll 0.5s'; // Add roll animation
+            setTimeout(() => {
+                rollButton.style.animation = ''; // Reset animation
+            }, 500);
+
+            const randomIndex = Math.floor(Math.random() * personas.length);
+            const persona = personas[randomIndex];
+
+            // Play the sound effect for the selected persona
+            soundEffect.src = persona.sound;
+            soundEffect.play();
+
+            // Fade out previous results
+            resultDiv.style.opacity = 0; // Fade out
+            descriptionDiv.style.opacity = 0; // Fade out
+            descriptionDiv.style.transform = 'translateY(-20px)'; // Move up
+
+            // After a short delay, update and fade in the result and description
+            setTimeout(() => {
+                resultDiv.textContent = `You rolled: ${persona.name}`;
+                descriptionDiv.innerHTML = `
+                    <img src="${persona.image}" alt="${persona.name}" class="persona-image">
+                    <div class="description-item"><strong>Description:</strong> ${persona.description}</div>
+                    <div class="description-item"><strong>Voice:</strong> ${persona.voice}</div>
+                    <div class="description-item"><strong>Action:</strong> ${persona.action}</div>
+                `;
+                // Apply the unique border color to the entire card
+                descriptionDiv.style.borderColor = persona.borderColor;
+                resultDiv.style.opacity = 1; // Fade in
+                resultDiv.style.transform = 'translateY(0)'; // Move back to original position
+                descriptionDiv.style.opacity = 1; // Fade in
+                descriptionDiv.style.transform = 'translateY(0)'; // Move back to original position
+            }, 500); // Delay for the fade effect
+        });
+    </script>
+</body>
+</html>
