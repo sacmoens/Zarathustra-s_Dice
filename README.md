@@ -42,3 +42,6 @@ Getting Started
 To run the app, simply open the following link in your web browser: [Zarathustra's Dice Live App](https://sacmoens.github.io/Zarathustra-s_Dice/)
 It is optimized for both desktop and mobile experiences.
 
+## License
+This project is licensed under the [MIT License](LICENSE).
+
