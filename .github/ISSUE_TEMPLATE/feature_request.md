@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-description: Suggest an idea for a new feature
+about: Use this template for suggesting new features.
 title: "[Feature Request]"
 labels: enhancement
 assignees: ''
